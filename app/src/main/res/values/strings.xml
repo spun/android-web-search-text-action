@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">WebSearchTextAction</string>
+    <string name="app_name">Web Search Action</string>
+    <string name="process_text_action_name">+ Web search</string>
 </resources>
