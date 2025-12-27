@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "com.spundev.websearchtextaction.data";
+option java_multiple_files = true;
+
+message UserPreferences {
+  oneof mode {
+    SearchApp search_app = 1;
+    BrowserURL browser_url = 2;
+  }
+}
+
+message SearchApp {}
+
+message BrowserURL {
+  string url = 1;
+}

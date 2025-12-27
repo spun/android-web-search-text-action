@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -44,6 +47,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -59,6 +63,21 @@ dependencies {
     // Compose tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    // DataStore
+    implementation(libs.androidx.datastore.proto)
+    implementation(libs.protobuf.kotlin.lite)
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    // After updating to Kotlin 2.3.0, we got this error when running the app:
+    //     [Hilt] Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0.
+    // Reports in the Dagger repository were closed saying that this was not something they should fix.
+    // To fix it ourselves, we need to add the dependency with the correct version manually.
+    // NOTE: We are not moving this to libs.versions.toml to make it clear that this is a temp fix and
+    //  that we should try to remove this line in the future to check if they changed their mind.
+    ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:${libs.versions.kotlin.get()}")
+    // Timber
+    implementation(libs.timber)
 
     // TESTS
     // For instrumentation tests
@@ -67,4 +86,18 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test)
     // For local unit tests
     testImplementation(libs.androidx.test.ext)
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") { option("lite") }
+                create("kotlin")
+            }
+        }
+    }
 }
