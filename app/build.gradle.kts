@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -76,6 +77,12 @@ dependencies {
     // NOTE: We are not moving this to libs.versions.toml to make it clear that this is a temp fix and
     //  that we should try to remove this line in the future to check if they changed their mind.
     ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:${libs.versions.kotlin.get()}")
+    // Hilt + AndroidX
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    // Navigation
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     // Timber
     implementation(libs.timber)
 
