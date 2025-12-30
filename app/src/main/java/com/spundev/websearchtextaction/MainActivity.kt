@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -30,29 +32,40 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WebSearchTextActionTheme {
-                val backStack = rememberNavBackStack(ModePickerRoute)
-                NavDisplay(
-                    backStack = backStack,
-                    entryDecorators = listOf(
-                        // Add the default decorators for managing scenes and saving state
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        // Then add the view model store decorator
-                        rememberViewModelStoreNavEntryDecorator()
-                    ),
-                    entryProvider = entryProvider {
-                        entry<ModePickerRoute> {
-                            ModePickerRoute(
-                                onBrowserConfig = {
-                                    backStack.add(BrowserConfigRoute)
-                                }
-                            )
-                        }
-                        entry<BrowserConfigRoute> {
-                            BrowserConfigRoute()
-                        }
+                Surface {
+                    NavProvider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NavProvider() {
+    val backStack = rememberNavBackStack(ModePickerRoute)
+    NavDisplay(
+        backStack = backStack,
+        entryDecorators = listOf(
+            // Add the default decorators for managing scenes and saving state
+            rememberSaveableStateHolderNavEntryDecorator(),
+            // Then add the view model store decorator
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            entry<ModePickerRoute> {
+                ModePickerRoute(
+                    onBrowserConfig = {
+                        backStack.add(BrowserConfigRoute)
+                    }
+                )
+            }
+            entry<BrowserConfigRoute> {
+                BrowserConfigRoute(
+                    onBack = {
+                        backStack.removeLastOrNull()
                     }
                 )
             }
         }
-    }
+    )
 }

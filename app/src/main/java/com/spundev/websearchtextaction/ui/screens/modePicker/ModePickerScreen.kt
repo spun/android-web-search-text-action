@@ -3,19 +3,23 @@ package com.spundev.websearchtextaction.ui.screens.modePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -43,7 +47,6 @@ fun ModePickerRoute(
         onSearchModeChange = viewModel::setSearchMode,
         onBrowserConfig = onBrowserConfig,
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxSize()
             .safeContentPadding()
     )
@@ -122,12 +125,13 @@ private fun SearchAppButton(
                 )
             )
             .background(MaterialTheme.colorScheme.surfaceBright)
+            .height(72.dp)
+            .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(16.dp)
-            .fillMaxWidth()
     ) {
-        RadioButton(selected = isSelected, onClick = onClick)
-        Text(text = "Search App", color = MaterialTheme.colorScheme.onSurface)
+        RadioButton(selected = isSelected, onClick = null)
+        Text(text = "Search App")
     }
 }
 
@@ -139,7 +143,6 @@ private fun BrowserModeButton(
     modifier: Modifier = Modifier
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .clip(
@@ -151,14 +154,33 @@ private fun BrowserModeButton(
                 )
             )
             .background(MaterialTheme.colorScheme.surfaceBright)
-            .clickable(onClick = onClick)
-            .padding(16.dp)
+            .height(72.dp)
             .fillMaxWidth()
     ) {
-        RadioButton(selected = isSelected, onClick = onClick)
-        Text(text = "Browser", color = MaterialTheme.colorScheme.onSurface)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .clickable(onClick = onClick)
+                .padding(16.dp)
+        ) {
+            RadioButton(selected = isSelected, onClick = null)
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = "Browser")
+            Spacer(
+                modifier = Modifier
+                    .widthIn(min = 16.dp)
+            )
+        }
         VerticalDivider(modifier = Modifier.heightIn(max = 32.dp))
-        IconButton(onClick = onConfig) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable(onClick = onConfig)
+                .padding(16.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_settings_24),
                 contentDescription = "Browser mode settings",
