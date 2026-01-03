@@ -92,12 +92,12 @@ private fun SearchModeButtons(
         modifier = modifier.width(IntrinsicSize.Max)
     ) {
         SearchAppButton(
-            isSelected = selectedSearchMode == SearchMode.SearchApp,
-            onClick = { onSearchModeChange(SearchMode.SearchApp) }
+            isSelected = selectedSearchMode == SearchMode.SEARCH_APP,
+            onClick = { onSearchModeChange(SearchMode.SEARCH_APP) }
         )
         BrowserModeButton(
-            isSelected = selectedSearchMode is SearchMode.BrowserUrl,
-            onClick = { onSearchModeChange(SearchMode.BrowserUrl("demo")) },
+            isSelected = selectedSearchMode == SearchMode.BROWSER,
+            onClick = { onSearchModeChange(SearchMode.BROWSER) },
             onConfig = onBrowserConfig
         )
     }

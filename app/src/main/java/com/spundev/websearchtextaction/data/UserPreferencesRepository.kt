@@ -24,43 +24,35 @@ class UserPreferencesRepository @Inject constructor(
             }
         }
 
-    val searchModeFlow: Flow<SearchMode> = userPreferencesFlow.map {
-        when (it.modeCase) {
-            UserPreferences.ModeCase.SEARCH_APP -> SearchMode.SearchApp
-            UserPreferences.ModeCase.BROWSER_URL -> SearchMode.BrowserUrl(it.browserUrl.url)
-            UserPreferences.ModeCase.MODE_NOT_SET -> {
-                // If nothing is set, use SearchApp
-                SearchMode.SearchApp
-            }
-        }
-    }
+    val searchModeFlow: Flow<SearchMode> = userPreferencesFlow.map { it.searchMode }
 
-    suspend fun getSearchMode(): SearchMode {
-        val up = userPreferencesFlow.first()
-        return when (up.modeCase) {
-            UserPreferences.ModeCase.SEARCH_APP -> SearchMode.SearchApp
-            UserPreferences.ModeCase.BROWSER_URL -> SearchMode.BrowserUrl(up.browserUrl.url)
-            UserPreferences.ModeCase.MODE_NOT_SET -> {
-                // If nothing is set, use SearchApp
-                SearchMode.SearchApp
-            }
-        }
-    }
+    suspend fun getSearchMode(): SearchMode = userPreferencesFlow.first().searchMode
 
     suspend fun setSearchMode(searchMode: SearchMode) {
         userPreferencesStore.updateData { currentPreferences ->
-            currentPreferences.toBuilder().apply {
-                when (searchMode) {
-                    SearchMode.SearchApp -> searchApp = SearchApp.getDefaultInstance()
-                    is SearchMode.BrowserUrl -> browserUrl =
-                        BrowserURL.newBuilder().setUrl(searchMode.url).build()
-                }
-            }.build()
+            currentPreferences.toBuilder().setSearchMode(searchMode).build()
         }
     }
-}
 
-sealed class SearchMode {
-    data object SearchApp : SearchMode()
-    data class BrowserUrl(val url: String) : SearchMode()
+    val browserModeConfigFlow: Flow<BrowserModeConfig> =
+        userPreferencesFlow.map { it.browserConfig }
+
+    suspend fun getBrowserModeConfig(): BrowserModeConfig =
+        userPreferencesFlow.first().browserConfig
+
+    suspend fun setSelectedSearchUrl(url: String) {
+        userPreferencesStore.updateData { currentPreferences ->
+            val browserConfig =
+                currentPreferences.browserConfig.toBuilder().setSelectedSearchUrl(url).build()
+            currentPreferences.toBuilder().setBrowserConfig(browserConfig).build()
+        }
+    }
+
+    suspend fun setCustomSearchUrl(url: String) {
+        userPreferencesStore.updateData { currentPreferences ->
+            val browserConfig =
+                currentPreferences.browserConfig.toBuilder().setCustomSearchUrl(url).build()
+            currentPreferences.toBuilder().setBrowserConfig(browserConfig).build()
+        }
+    }
 }

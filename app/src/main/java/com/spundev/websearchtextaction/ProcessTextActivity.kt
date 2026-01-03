@@ -34,21 +34,23 @@ class ProcessTextActivity : ComponentActivity() {
             if (!text.isNullOrEmpty()) {
 
                 val intent = when (selectedSearchMode) {
-                    SearchMode.SearchApp -> {
+                    SearchMode.SEARCH_APP,
+                    SearchMode.UNRECOGNIZED -> {
                         // Option 1: Use SEARCH app
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
                         intent.putExtra(SearchManager.QUERY, text)
                         intent
                     }
 
-                    is SearchMode.BrowserUrl -> {
+                    SearchMode.BROWSER -> {
+                        val browserModeConfig = userPreferencesRepository.getBrowserModeConfig()
+
                         // Option 2: Use ACTION_VIEW with a URL to use the browser
                         val encodedText =
                             URLEncoder.encode(text.toString(), StandardCharsets.UTF_8.toString())
-                        val searchUrl =
-                            "https://<selected_search_provider>/?q=%s&kl=es-es&kbj=1".format(
-                                encodedText
-                            )
+                        val searchUrl = browserModeConfig.selectedSearchUrl.format(
+                            encodedText
+                        )
                         Intent(Intent.ACTION_VIEW, searchUrl.toUri())
                     }
                 }
