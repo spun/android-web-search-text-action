@@ -4,9 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
@@ -105,7 +111,11 @@ fun BrowserConfigRoute(
         onBack = onBack,
         onSelectedSearchURLChange = viewModel::setSelectedSearchUrl,
         onCustomSearchUrlChange = viewModel::setCustomSearchUrl,
-        modifier = Modifier.safeContentPadding()
+        modifier = Modifier.windowInsetsPadding(
+            insets = WindowInsets.safeDrawing.only(
+                sides = WindowInsetsSides.Horizontal
+            )
+        )
     )
 }
 
@@ -172,6 +182,13 @@ private fun BrowserConfigScreen(
                             }
                         )
                     }
+
+                    // Bottom system bar
+                    Spacer(
+                        modifier = Modifier.windowInsetsBottomHeight(
+                            insets = WindowInsets.systemBars
+                        )
+                    )
                 }
             }
         }
