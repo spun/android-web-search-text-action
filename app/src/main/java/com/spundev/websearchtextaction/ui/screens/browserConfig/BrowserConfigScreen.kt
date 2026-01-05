@@ -41,64 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spundev.websearchtextaction.R
-
-private data class SearchProvider(
-    val id: String,
-    val name: String,
-    val url: String,
-    val searchUrl: String,
-)
-
-private val listSearchProviders: List<SearchProvider> = listOf(
-    SearchProvider(
-        id = "g",
-        name = "Google",
-        url = "google.com",
-        searchUrl = "https://www.google.com/search?q=%s"
-    ),
-    SearchProvider(
-        id = "mb",
-        name = "Microsoft Bing",
-        url = "bing.com",
-        searchUrl = "https://www.bing.com/search?q=%s"
-    ),
-    SearchProvider(
-        id = "ys",
-        name = "Yahoo",
-        url = "yahoo.com",
-        searchUrl = "https://search.yahoo.com/search?p=%s"
-    ),
-    SearchProvider(
-        id = "ddg",
-        name = "DuckDuckGo",
-        url = "duckduckgo.com",
-        searchUrl = "https://duckduckgo.com/?q=%s"
-    ),
-    SearchProvider(
-        id = "ec",
-        name = "Ecosia",
-        url = "ecosia.org",
-        searchUrl = "https://www.ecosia.org/search?q=%s"
-    ),
-    SearchProvider(
-        id = "qw",
-        name = "Qwant",
-        url = "qwant.com",
-        searchUrl = "https://www.qwant.com/?q=%s"
-    ),
-    SearchProvider(
-        id = "bs",
-        name = "Brave",
-        url = "search.brave.com",
-        searchUrl = "https://search.brave.com/search?q=%s"
-    ),
-    SearchProvider(
-        id = "pw",
-        name = "PrivacyWall",
-        url = "privacywall.org",
-        searchUrl = "https://www.privacywall.org/search/secure/?q=%s"
-    ),
-)
+import com.spundev.websearchtextaction.model.listSearchProviders
 
 @Composable
 fun BrowserConfigRoute(
@@ -206,7 +149,7 @@ private fun CustomOptionListItem(
     ListItem(
         colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent),
         headlineContent = { Text("Custom") },
-        supportingContent = { Text(text = if (isSelected) initialURL else "Custom search url") },
+        supportingContent = { Text(text = if (isSelected && !initialURL.isEmpty()) initialURL else "Custom search url") },
         trailingContent = { RadioButton(selected = isSelected, onClick = null) },
         modifier = Modifier.clickable(onClick = { openDialog = true })
     )

@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.spundev.websearchtextaction.data.SearchMode
 import com.spundev.websearchtextaction.data.UserPreferencesRepository
+import com.spundev.websearchtextaction.model.DEFAULT_SEARCH_PROVIDER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,13 +45,17 @@ class ProcessTextActivity : ComponentActivity() {
 
                     SearchMode.BROWSER -> {
                         val browserModeConfig = userPreferencesRepository.getBrowserModeConfig()
+                        val selectedSearchUrl =
+                            if (!browserModeConfig.selectedSearchUrl.isNullOrEmpty()) {
+                                browserModeConfig.selectedSearchUrl
+                            } else {
+                                DEFAULT_SEARCH_PROVIDER.searchUrl
+                            }
 
                         // Option 2: Use ACTION_VIEW with a URL to use the browser
                         val encodedText =
                             URLEncoder.encode(text.toString(), StandardCharsets.UTF_8.toString())
-                        val searchUrl = browserModeConfig.selectedSearchUrl.format(
-                            encodedText
-                        )
+                        val searchUrl = selectedSearchUrl.format(encodedText)
                         Intent(Intent.ACTION_VIEW, searchUrl.toUri())
                     }
                 }
