@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">Web Search Action</string>
     <string name="process_text_action_name">+ Web search</string>
+    <!-- Mode picker screen -->
+    <string name="mode_picker_browser_settings_description">Browser mode settings</string>
+    <string name="mode_picker_search_app_mode">Search App</string>
+    <string name="mode_picker_browser_mode">Browser</string>
+    <!-- Browser config screen -->
+    <string name="toolbar_navigate_up">Navigate up</string>
+    <string name="browser_config_title">Search provider</string>
+    <string name="browser_config_custom_title">Custom</string>
+    <string name="browser_config_custom_description">Custom search url</string>
+    <!-- Browser config screen -> Edit dialog -->
+    <string name="browser_config_custom_dialog_title">Custom search url</string>
+    <string name="browser_config_custom_dialog_description">URL with %s in place of search term.\n\nFor example:\nhttps://www.google.com/search?q=%s</string>
+    <string name="browser_config_custom_dialog_confirm">Confirm</string>
+    <string name="browser_config_custom_dialog_cancel">Cancel</string>
+    <string name="browser_config_custom_dialog_error_empty">Please enter a URL</string>
+    <string name="browser_config_custom_dialog_error_invalid_url">That URL doesn’t look right. Please check it and try again</string>
+    <string name="browser_config_custom_dialog_error_missing_search_term">Try including %s in place of the search term</string>
 </resources>

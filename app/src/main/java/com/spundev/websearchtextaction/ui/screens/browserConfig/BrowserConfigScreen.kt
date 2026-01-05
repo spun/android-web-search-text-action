@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -80,12 +81,12 @@ private fun BrowserConfigScreen(
 ) {
     Column(modifier = modifier) {
         TopAppBar(
-            title = { Text("Search provider") },
+            title = { Text(stringResource(R.string.browser_config_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back_24),
-                        contentDescription = "Navigate up",
+                        contentDescription = stringResource(R.string.toolbar_navigate_up),
                     )
                 }
             }
@@ -122,8 +123,12 @@ private fun BrowserConfigScreen(
                     // Custom option is always first
                     CustomOptionListItem(
                         editTextFieldState = customEditTextFieldState,
-                        headlineText = "Custom",
-                        supportingText = if (isCustomSelected && !customURL.isEmpty()) customURL else "Custom search url",
+                        headlineText = stringResource(R.string.browser_config_custom_title),
+                        supportingText = if (isCustomSelected && !customURL.isEmpty()) {
+                            customURL
+                        } else {
+                            stringResource(R.string.browser_config_custom_description)
+                        },
                         isSelected = isCustomSelected,
                         isEditDialogOpen = isCustomEditDialogOpen,
                         onConfirm = onCustomSearchUrlChange,
@@ -168,13 +173,13 @@ private fun BrowserConfigScreen(
     }
 }
 
-private fun getCustomOptionErrorMessage(text: String): String? {
+private fun getCustomOptionErrorMessage(text: String): Int? {
     return if (text.isEmpty()) {
-        "Please enter a URL"
+        R.string.browser_config_custom_dialog_error_empty
     } else if (!isValidUrl(text)) {
-        "That URL doesn’t look right. Please check it and try again"
+        R.string.browser_config_custom_dialog_error_invalid_url
     } else if (!text.contains("%s")) {
-        "Try including %s in place of the search term"
+        R.string.browser_config_custom_dialog_error_missing_search_term
     } else {
         null
     }
@@ -203,14 +208,14 @@ private fun CustomOptionListItem(
 
     if (isEditDialogOpen) {
 
-        var inputError by remember { mutableStateOf<String?>(null) }
+        var inputErrorRes by remember { mutableStateOf<Int?>(null) }
         var checkErrorsOnEdit by remember { mutableStateOf(false) }
 
         // After first error is displayed, keep checking after each edit
         if (checkErrorsOnEdit) {
             LaunchedEffect(editTextFieldState) {
                 snapshotFlow { editTextFieldState.text.toString() }.collectLatest { text ->
-                    inputError = getCustomOptionErrorMessage(text)
+                    inputErrorRes = getCustomOptionErrorMessage(text)
                 }
             }
         }
@@ -222,15 +227,15 @@ private fun CustomOptionListItem(
                 // onDismissRequest.
                 onDismissRequest()
             },
-            title = { Text(text = "Custom search url") },
+            title = { Text(text = stringResource(R.string.browser_config_custom_dialog_title)) },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text(text = "URL with %s in place of search term.\n\nFor example:\nhttps://www.google.com/search?q=%s")
+                    Text(text = stringResource(R.string.browser_config_custom_dialog_description))
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
                         state = editTextFieldState,
-                        isError = inputError != null,
-                        supportingText = { inputError?.let { Text(it) } }
+                        isError = inputErrorRes != null,
+                        supportingText = { inputErrorRes?.let { Text(stringResource(it)) } }
                     )
                 }
             },
@@ -240,17 +245,17 @@ private fun CustomOptionListItem(
                         val text = editTextFieldState.text.toString()
                         val errorMsg = getCustomOptionErrorMessage(text)
                         if (errorMsg != null) {
-                            inputError = errorMsg
+                            inputErrorRes = errorMsg
                             checkErrorsOnEdit = true
                         } else {
                             onConfirm(text)
                             onDismissRequest()
                         }
                     }
-                ) { Text("Confirm") }
+                ) { Text(stringResource(R.string.browser_config_custom_dialog_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = onDismissRequest) { Text("Cancel") }
+                TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.browser_config_custom_dialog_cancel)) }
             },
         )
     }

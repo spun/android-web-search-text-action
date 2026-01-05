@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Web Search Action</string>
+    <string name="process_text_action_name">+ Búsqueda web</string>
+    <!-- Mode picker screen -->
+    <string name="mode_picker_browser_settings_description">Configurar modo navegador</string>
+    <string name="mode_picker_search_app_mode">Aplicación de búsqueda</string>
+    <string name="mode_picker_browser_mode">Navegador</string>
+    <!-- Browser config screen -->
+    <string name="toolbar_navigate_up">Desplazarse hacia arriba</string>
+    <string name="browser_config_title">Buscador</string>
+    <string name="browser_config_custom_title">Personalizado</string>
+    <string name="browser_config_custom_description">URL de búsqueda personalizada</string>
+    <!-- Browser config screen -> Edit dialog -->
+    <string name="browser_config_custom_dialog_title">Introduce una URL</string>
+    <string name="browser_config_custom_dialog_description">URL con %s en el lugar del término de búsqueda.\n\nPor ejemplo:\nhttps://www.google.com/search?q=%s</string>
+    <string name="browser_config_custom_dialog_confirm">Confirmar</string>
+    <string name="browser_config_custom_dialog_cancel">Cancelar</string>
+    <string name="browser_config_custom_dialog_error_empty">Introduce una URL</string>
+    <string name="browser_config_custom_dialog_error_invalid_url">La URL no parece correcta. Revísala e inténtalo de nuevo</string>
+    <string name="browser_config_custom_dialog_error_missing_search_term">Prueba a incluir %s en el lugar del término de búsqueda</string>
+</resources>

@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -131,7 +132,7 @@ private fun SearchAppButton(
             .padding(16.dp)
     ) {
         RadioButton(selected = isSelected, onClick = null)
-        Text(text = "Search App")
+        Text(text = stringResource(R.string.mode_picker_search_app_mode))
     }
 }
 
@@ -167,7 +168,7 @@ private fun BrowserModeButton(
         ) {
             RadioButton(selected = isSelected, onClick = null)
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "Browser")
+            Text(text = stringResource(R.string.mode_picker_browser_mode))
             Spacer(
                 modifier = Modifier
                     .widthIn(min = 16.dp)
@@ -183,7 +184,7 @@ private fun BrowserModeButton(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_settings_24),
-                contentDescription = "Browser mode settings",
+                contentDescription = stringResource(R.string.mode_picker_browser_settings_description),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
