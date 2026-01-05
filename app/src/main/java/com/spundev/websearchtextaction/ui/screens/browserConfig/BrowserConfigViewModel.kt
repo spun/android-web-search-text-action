@@ -2,6 +2,7 @@ package com.spundev.websearchtextaction.ui.screens.browserConfig
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.spundev.websearchtextaction.data.SearchMode
 import com.spundev.websearchtextaction.data.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +31,13 @@ class BrowserConfigViewModel @Inject constructor(
 
     fun setSelectedSearchUrl(url: String) {
         viewModelScope.launch {
-            userPreferencesRepository.setSelectedSearchUrl(url)
+            launch {
+                userPreferencesRepository.setSelectedSearchUrl(url)
+            }
+            // If browser config is modified, assume that browser mode should be enabled
+            launch {
+                userPreferencesRepository.setSearchMode(SearchMode.BROWSER)
+            }
         }
     }
 
@@ -43,6 +50,10 @@ class BrowserConfigViewModel @Inject constructor(
             // Set the new custom URL as the active one
             launch {
                 userPreferencesRepository.setSelectedSearchUrl(url)
+            }
+            // If browser config is modified, assume that browser mode should be enabled
+            launch {
+                userPreferencesRepository.setSearchMode(SearchMode.BROWSER)
             }
         }
     }
