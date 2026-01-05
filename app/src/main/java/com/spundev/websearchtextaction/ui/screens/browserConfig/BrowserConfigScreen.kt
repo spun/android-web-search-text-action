@@ -1,6 +1,7 @@
 package com.spundev.websearchtextaction.ui.screens.browserConfig
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,9 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -102,16 +105,30 @@ private fun BrowserConfigScreen(
             is BrowserConfigUiState.Success -> {
                 val selectedURL = uiState.selectedSearchURL
                 val customURL = uiState.customSearchURL
+
+                val customEditTextFieldState = rememberTextFieldState(customURL)
+                var isCustomEditDialogOpen by remember { mutableStateOf(false) }
+
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .verticalScroll(rememberScrollState())
                 ) {
+                    // Do not mark the custom option as selected if its value is the same as another
+                    // search provider
+                    val isCustomSelected = remember(selectedURL, customURL, listSearchProviders) {
+                        selectedURL == customURL && listSearchProviders.none { it.searchUrl == selectedURL }
+                    }
                     // Custom option is always first
                     CustomOptionListItem(
-                        initialURL = customURL,
-                        isSelected = selectedURL == customURL || listSearchProviders.none { it.searchUrl == selectedURL },
-                        onCustomURLChange = onCustomSearchUrlChange
+                        editTextFieldState = customEditTextFieldState,
+                        headlineText = "Custom",
+                        supportingText = if (isCustomSelected && !customURL.isEmpty()) customURL else "Custom search url",
+                        isSelected = isCustomSelected,
+                        isEditDialogOpen = isCustomEditDialogOpen,
+                        onConfirm = onCustomSearchUrlChange,
+                        onEditRequest = { isCustomEditDialogOpen = true },
+                        onDismissRequest = { isCustomEditDialogOpen = false },
                     )
                     // Display predefined search providers
                     listSearchProviders.forEach {
@@ -122,11 +139,20 @@ private fun BrowserConfigScreen(
                             headlineContent = { Text(it.name) },
                             supportingContent = { Text(it.url) },
                             trailingContent = {
-                                RadioButton(selected = it.searchUrl == selectedURL, onClick = null)
+                                RadioButton(
+                                    selected = it.searchUrl == selectedURL,
+                                    onClick = null
+                                )
                             },
-                            modifier = Modifier.clickable {
-                                onSelectedSearchURLChange(it.searchUrl)
-                            }
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    onSelectedSearchURLChange(it.searchUrl)
+                                },
+                                onLongClick = {
+                                    customEditTextFieldState.setTextAndPlaceCursorAtEnd(it.searchUrl)
+                                    isCustomEditDialogOpen = true
+                                }
+                            )
                         )
                     }
 
@@ -156,29 +182,34 @@ private fun getCustomOptionErrorMessage(text: String): String? {
 
 @Composable
 private fun CustomOptionListItem(
-    initialURL: String,
+    editTextFieldState: TextFieldState,
+    headlineText: String,
+    supportingText: String,
     isSelected: Boolean,
-    onCustomURLChange: (String) -> Unit,
+    isEditDialogOpen: Boolean,
+    onConfirm: (String) -> Unit,
+    onEditRequest: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    var openDialog by remember { mutableStateOf(false) }
 
     ListItem(
         colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent),
-        headlineContent = { Text("Custom") },
-        supportingContent = { Text(text = if (isSelected && !initialURL.isEmpty()) initialURL else "Custom search url") },
+        headlineContent = { Text(text = headlineText) },
+        // supportingContent = { Text(text = if (isSelected && !editTextFieldState.text.isEmpty()) editTextFieldState.text.toString() else "Custom search url") },
+        supportingContent = { Text(text = supportingText) },
         trailingContent = { RadioButton(selected = isSelected, onClick = null) },
-        modifier = Modifier.clickable(onClick = { openDialog = true })
+        modifier = Modifier.clickable(onClick = onEditRequest)
     )
 
-    if (openDialog) {
-        val state = rememberTextFieldState(initialURL)
+    if (isEditDialogOpen) {
+
         var inputError by remember { mutableStateOf<String?>(null) }
         var checkErrorsOnEdit by remember { mutableStateOf(false) }
 
         // After first error is displayed, keep checking after each edit
         if (checkErrorsOnEdit) {
-            LaunchedEffect(state) {
-                snapshotFlow { state.text.toString() }.collectLatest { text ->
+            LaunchedEffect(editTextFieldState) {
+                snapshotFlow { editTextFieldState.text.toString() }.collectLatest { text ->
                     inputError = getCustomOptionErrorMessage(text)
                 }
             }
@@ -189,7 +220,7 @@ private fun CustomOptionListItem(
                 // Dismiss the dialog when the user clicks outside the dialog or on the back
                 // button. If you want to disable that functionality, simply use an empty
                 // onDismissRequest.
-                openDialog = false
+                onDismissRequest()
             },
             title = { Text(text = "Custom search url") },
             text = {
@@ -197,7 +228,7 @@ private fun CustomOptionListItem(
                     Text(text = "URL with %s in place of search term.\n\nFor example:\nhttps://www.google.com/search?q=%s")
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
-                        state = state,
+                        state = editTextFieldState,
                         isError = inputError != null,
                         supportingText = { inputError?.let { Text(it) } }
                     )
@@ -206,20 +237,20 @@ private fun CustomOptionListItem(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val text = state.text.toString()
+                        val text = editTextFieldState.text.toString()
                         val errorMsg = getCustomOptionErrorMessage(text)
                         if (errorMsg != null) {
                             inputError = errorMsg
                             checkErrorsOnEdit = true
                         } else {
-                            onCustomURLChange(text)
-                            openDialog = false
+                            onConfirm(text)
+                            onDismissRequest()
                         }
                     }
                 ) { Text("Confirm") }
             },
             dismissButton = {
-                TextButton(onClick = { openDialog = false }) { Text("Cancel") }
+                TextButton(onClick = onDismissRequest) { Text("Cancel") }
             },
         )
     }
