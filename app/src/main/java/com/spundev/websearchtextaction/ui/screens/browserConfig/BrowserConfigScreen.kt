@@ -29,10 +29,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +44,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spundev.websearchtextaction.R
 import com.spundev.websearchtextaction.model.listSearchProviders
+import com.spundev.websearchtextaction.util.isValidUrl
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun BrowserConfigRoute(
@@ -138,6 +142,18 @@ private fun BrowserConfigScreen(
     }
 }
 
+private fun getCustomOptionErrorMessage(text: String): String? {
+    return if (text.isEmpty()) {
+        "Please enter a URL"
+    } else if (!isValidUrl(text)) {
+        "That URL doesn’t look right. Please check it and try again"
+    } else if (!text.contains("%s")) {
+        "Try including %s in place of the search term"
+    } else {
+        null
+    }
+}
+
 @Composable
 private fun CustomOptionListItem(
     initialURL: String,
@@ -156,6 +172,18 @@ private fun CustomOptionListItem(
 
     if (openDialog) {
         val state = rememberTextFieldState(initialURL)
+        var inputError by remember { mutableStateOf<String?>(null) }
+        var checkErrorsOnEdit by remember { mutableStateOf(false) }
+
+        // After first error is displayed, keep checking after each edit
+        if (checkErrorsOnEdit) {
+            LaunchedEffect(state) {
+                snapshotFlow { state.text.toString() }.collectLatest { text ->
+                    inputError = getCustomOptionErrorMessage(text)
+                }
+            }
+        }
+
         AlertDialog(
             onDismissRequest = {
                 // Dismiss the dialog when the user clicks outside the dialog or on the back
@@ -170,16 +198,23 @@ private fun CustomOptionListItem(
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
                         state = state,
-                        // isError = true,
-                        // supportingText = { Text("Include %s in place of the search term.") }
+                        isError = inputError != null,
+                        supportingText = { inputError?.let { Text(it) } }
                     )
                 }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onCustomURLChange(state.text.toString())
-                        openDialog = false
+                        val text = state.text.toString()
+                        val errorMsg = getCustomOptionErrorMessage(text)
+                        if (errorMsg != null) {
+                            inputError = errorMsg
+                            checkErrorsOnEdit = true
+                        } else {
+                            onCustomURLChange(text)
+                            openDialog = false
+                        }
                     }
                 ) { Text("Confirm") }
             },
