@@ -68,6 +68,8 @@ class ProcessTextActivity : ComponentActivity() {
                         "No app found to perform the search.",
                         Toast.LENGTH_SHORT
                     ).show()
+                } finally {
+                    finish()
                 }
             }
         }
