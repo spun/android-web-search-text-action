@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.spundev.websearchtextaction.data";
+option java_multiple_files = true;
+
+message UserPreferences {
+    SearchMode searchMode = 1;
+    BrowserModeConfig browser_config = 2;
+}
+
+enum SearchMode {
+    // Use default search app
+    SEARCH_APP = 0;
+    // Use browser
+    BROWSER = 1;
+}
+
+// Configuration for "browser" mode
+message BrowserModeConfig {
+    string selected_search_url = 1;
+    string custom_search_url = 2;
+}
